@@ -1,0 +1,74 @@
+<!-- cls && browser-sync start --proxy localhost:5000 --port 5001 --files "src/**/*" | firebase serve -->
+<!doctype html>
+<html lang="en" ng-app>
+
+<head>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>Training Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            text-align: center;
+        }
+
+        form input {
+            width: 19%;
+            /*min-width: 150px;*/
+        }
+
+        select {
+            width: 19%;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        .tf {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="button" value="Add More Data" onclick="addFields();" />
+    <input type="button" value="Delete Last Data" onclick="delFields();" />
+    <br>
+    <br>
+    <form id="form-selector" class="inline">
+        <input name="url" placeholder="YouTube Link" required>
+        <br>
+        <div id="add"></div>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+    <hr>
+    <input id="download" type="button" value="Download ALL the latest training data as JSON" onclick='download("data.js", getLatestData());'
+    disabled />
+    <p id="lastUpdated"></p>
+    <hr>
+    <input id="showFBData" type="button" value="Show Firebase Training Data" onclick="showData();" disabled />
+    <select id="selectedData" name="dataType" disabled></select>
+    <br>
+    <!-- <br> -->
+    <p id="dataTypes"></p>
+    <table style="width:100%" id="tdb">
+        <tr>
+            <th>pose</th>
+            <th>trainingFrame</th>
+            <th>openposeFrame</th>
+            <th>DATA</th>
+            <th>key</th>
+        </tr>
+    </table>
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-database.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
