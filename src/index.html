@@ -12,9 +12,18 @@
             text-align: center;
         }
 
+        input:disabled+label {
+            color: #ccc;
+        }
+
         form input {
             width: 19%;
-            /*min-width: 150px;*/
+        }
+
+        pre {
+            width: fit-content;
+            margin: auto;
+            text-align: justify;
         }
 
         select {
@@ -44,18 +53,46 @@
         <br>
         <div id="add"></div>
         <br>
-        <input type="submit" value="Submit">
-    </form>
+        <input type="submit" value="Submit"> </form>
+    <br>
+    <input type="checkbox" id="deleteAfter" name="deleteAfter" value="deleteAfter" onclick="deleteAftr()" disabled>
+    <label for="deleteAfter">Delete files after processing</label>
+    <br>
     <hr>
-    <input id="download" type="button" value="Download ALL the latest training data as JSON" onclick='download("data.js", getLatestData());'
-    disabled />
+    <input id="showHistory" type="button" value="Show History" onclick="toggleHistoryView();" disabled />
+    <div id="histView" style="display: none;">
+        <br>
+        <input id="requeHistory" type="button" value="Requeue History" onclick="requeHistory();" />
+        <br>
+        <br>
+        <table style="width:100%" id="histTable">
+            <tr>
+                <th>History URLs</th>
+                <th>History Times</th>
+                <th>History Keys</th>
+            </tr>
+        </table>
+    </div>
+    <div id="queView" style="display: none;">
+        <hr>
+        <table style="width:100%" id="queTable">
+            <tr>
+                <th>Queue URLs</th>
+                <th>Queue Times</th>
+                <th>Queue Keys</th>
+            </tr>
+        </table>
+    </div>
+    <hr>
+    <input id="download" type="button" value="Download latest training data.js" onclick="getLatestData()" disabled />
     <p id="lastUpdated"></p>
     <hr>
     <input id="showFBData" type="button" value="Show Firebase Training Data" onclick="showData();" disabled />
     <select id="selectedData" name="dataType" disabled></select>
     <br>
-    <!-- <br> -->
-    <p id="dataTypes"></p>
+    <br>
+    <pre id="dataTypes"></pre>
+    <br>
     <table style="width:100%" id="tdb">
         <tr>
             <th>pose</th>
