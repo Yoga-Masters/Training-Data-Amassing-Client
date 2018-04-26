@@ -69,6 +69,7 @@ tdb.ref("queue").on("value", snap => {
             var row = document.createElement("tr");
             var times = Object.assign({}, data[req]);
             delete times.url;
+            delete times.status;
             row.innerHTML = "<td>" + req + " => " + data[req].url + "</td><td><pre>" + JSON.stringify(times, null, 4) + "</pre></td><td>" + (data[req].status ? data[req].status : "Untouched/Empty") + "</td>";
             table.appendChild(row);
         }
