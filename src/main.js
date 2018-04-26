@@ -90,6 +90,7 @@ tdb.ref("history").on("value", snap => {
         var row = document.createElement("tr");
         var times = Object.assign({}, data[req]);
         delete times.url;
+        delete times.status;
         row.innerHTML = "<td>" + data[req].url + "</td><td><pre>\n\n" + JSON.stringify(times, null, 4) + "\n\n</pre></td><td class='deleteBtn'><a onclick='delHist(\"" + req + "\");' href='javascript:void(0);'>Delete " + req + "</a><br><br><a onclick='reqHistReq(\"" + req + "\");' href='javascript:void(0);'>Reque " + req + "</a></td>";
         table.appendChild(row);
     }
