@@ -5,6 +5,7 @@ var latestData;
 var types = {};
 var frames = {};
 var canShow = false;
+var maxFPS = document.getElementById("maxFPS");
 var queView = document.getElementById("queView");
 var histJson = document.getElementById("histjson");
 var histView = document.getElementById("histView");
@@ -47,6 +48,11 @@ tdb.ref("types").on("value", snap => {
 tdb.ref("frames").on("value", snap => {
     frames = snap.val();
     resettingData();
+});
+tdb.ref("maxFPS").on("value", snap => {
+    maxFPS.disabled = true;
+    maxFPS.value = snap.val();
+    maxFPS.disabled = false;
 });
 tdb.ref("delete").on("value", snap => {
     deleteAfter.disabled = true;
@@ -95,6 +101,16 @@ function deleteAftr() {
     var cal = deleteAfter.checked;
     deleteAfter.disabled = true;
     tdb.ref("delete").set(cal);
+}
+
+function updateFPS() {
+    var val = Number.parseInt(maxFPS.value);
+    maxFPS.disabled = true;
+    if (val > 0 && val < 21 && Number.isInteger(val)) tdb.ref("maxFPS").set(val);
+    else tdb.ref("maxFPS").once("value", snap => {
+        maxFPS.value = snap.val();
+        maxFPS.disabled = false;
+    });
 }
 
 function delData(key) {

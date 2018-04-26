@@ -20,6 +20,16 @@
             width: 19%;
         }
 
+        input:invalid+span:after {
+            content: '✖';
+            padding-left: 5px;
+        }
+
+        input:valid+span:after {
+            content: '✓';
+            padding-left: 5px;
+        }
+
         pre {
             width: fit-content;
             margin: auto;
@@ -40,6 +50,10 @@
             width: 100px;
             height: 100px;
         }
+
+        #maxFPS {
+            width: 3em;
+        }
     </style>
 </head>
 
@@ -54,6 +68,10 @@
         <div id="add"></div>
         <br>
         <input type="submit" value="Submit"> </form>
+    <br>
+    <input type="number" id="maxFPS" name="maxFPS" placeholder="fps" max="20" min="1" step="1" onchange="updateFPS()" disabled>
+    <label for="maxFPS"> - Max FPS to sample video (1 - 20)</label>
+    <br>
     <br>
     <input type="checkbox" id="deleteAfter" name="deleteAfter" value="deleteAfter" onclick="deleteAftr()" disabled>
     <label for="deleteAfter">Delete files after processing</label>
