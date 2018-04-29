@@ -18,7 +18,8 @@ var formSelector = document.getElementById("form-selector");
 var poseIndex = {
     "warriorii": 0,
     "tree": 1,
-    "triangle": 2
+    "triangle": 2,
+    "none": 3
 };
 const formToJSON = elements => [].reduce.call(elements, (data, element) => {
     data[element.name] = element.value;
@@ -270,16 +271,17 @@ function addFields() { //code for adding the next three fields again
     newSelect.setAttribute("name", "selectedPose" + count);
     newSelect.setAttribute("id", "selectedPose" + count);
     newSelect.setAttribute("required", true);
-    var array = ["warriorii", "tree", "triangle"];
-    var arrayText = ["Warrior 2 Pose", "Tree Pose", "Triangle Pose"];
-    for (var i = 0; i < 3; i++) {
+    // var array = ["warriorii", "tree", "triangle"];
+    // var arrayText = ["Warrior 2 Pose", "Tree Pose", "Triangle Pose"];
+    var array = ["warriorii", "tree", "triangle", "none"];
+    var arrayText = ["Warrior 2 Pose", "Tree Pose", "Triangle Pose", "No Pose"];
+    for (var i = 0; i < array.length; i++) {
         var option = document.createElement("option");
         option.value = array[i];
         option.text = arrayText[i];
         newSelect.appendChild(option);
     }
     document.getElementById("add").appendChild(newSelect);
-    // console.log("Adding #" + count + " fields...");
     count += 1;
 }
 
