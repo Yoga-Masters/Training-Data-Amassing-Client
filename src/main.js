@@ -2,8 +2,10 @@
 var time = 0;
 var count = 1;
 var latestData;
+var selectData;
 var types = {};
 var frames = {};
+var poseIndex = {};
 var canShow = false;
 var maxFPS = document.getElementById("maxFPS");
 var queView = document.getElementById("queView");
@@ -15,12 +17,6 @@ var deleteAfter = document.getElementById("deleteAfter");
 var showHistory = document.getElementById("showHistory");
 var selectedData = document.getElementById("selectedData");
 var formSelector = document.getElementById("form-selector");
-var poseIndex = {
-    "warriorii": 0,
-    "tree": 1,
-    "triangle": 2,
-    "none": 3
-};
 const formToJSON = elements => [].reduce.call(elements, (data, element) => {
     data[element.name] = element.value;
     return data;
@@ -39,26 +35,31 @@ var auth = firebase.auth();
 auth.signInAnonymously();
 setInterval(updateTime, 1000);
 // ========================= PASSIVE FIREBASE FUNCTIONS =========================
-tdb.ref("lastUpdated").on("value", snap => {
-    time = snap.val();
-});
-tdb.ref("types").on("value", snap => {
-    types = snap.val();
+tdb.ref("config").on("value", snap => {
+    var config = snap.val();
+    selectData = config.training.data;
+    time = config.lastUpdated;
+    types = config.types;
+    poseIndex = (Object.values(config.poseIndex)).sort().reduce((accumulator, currentValue, currentIndex, array) => {
+        accumulator[Object.keys(config.poseIndex)[Object.values(config.poseIndex).indexOf(array[currentIndex])]] = array[currentIndex];
+        return accumulator;
+    }, {});
+    maxFPS.value = config.maxFPS;
+    deleteAfter.checked = config.delete;
+    selectedData.disabled = true;
+    document.querySelectorAll('#selectedData option').forEach(option => option.remove());
+    for (const key in types) {
+        var option = document.createElement("option");
+        option.text = types[key].toUpperCase();
+        option.value = key;
+        selectedData.appendChild(option);
+    }
     resettingData();
+    selectedData.disabled = false;
 });
 tdb.ref("frames").on("value", snap => {
     frames = snap.val();
     resettingData();
-});
-tdb.ref("maxFPS").on("value", snap => {
-    maxFPS.disabled = true;
-    maxFPS.value = snap.val();
-    maxFPS.disabled = false;
-});
-tdb.ref("delete").on("value", snap => {
-    deleteAfter.disabled = true;
-    deleteAfter.checked = snap.val();
-    deleteAfter.disabled = false;
 });
 tdb.ref("queue").on("value", snap => {
     if (!snap.val()) queView.style.display = "none";
@@ -103,16 +104,22 @@ tdb.ref("history").on("value", snap => {
 function deleteAftr() {
     var cal = deleteAfter.checked;
     deleteAfter.disabled = true;
-    tdb.ref("delete").set(cal);
+    tdb.ref("config/delete").set(cal);
 }
 
 function updateFPS() {
     var val = Number.parseInt(maxFPS.value);
     maxFPS.disabled = true;
-    if (val > 0 && val < 21 && Number.isInteger(val)) tdb.ref("maxFPS").set(val);
-    else tdb.ref("maxFPS").once("value", snap => {
+    if (val > 0 && val < 21 && Number.isInteger(val)) tdb.ref("config/maxFPS").set(val);
+    else tdb.ref("config/maxFPS").once("value", snap => {
         maxFPS.value = snap.val();
         maxFPS.disabled = false;
+    });
+}
+
+function changePose(key) {
+    tdb.ref("frames/" + key + "/pose").set(document.getElementById(key + "change").value, () => {
+        console.log("Changed frame " + key + " pose to " + document.getElementById(key + "change").value);
     });
 }
 
@@ -149,18 +156,12 @@ function requeHistory() {
 }
 // ================ LATEST DATA JS DOWNLOAD HANDLING FUNCTIONS ================
 function resettingData() {
+    maxFPS.disabled = true;
+    deleteAfter.disabled = true;
     downloader.disabled = true;
     showfbdata.disabled = true;
-    selectedData.disabled = true;
-    document.querySelectorAll('#selectedData option').forEach(option => option.remove());
-    for (const key in types) {
-        var option = document.createElement("option");
-        option.text = types[key].toUpperCase();
-        option.value = key;
-        selectedData.appendChild(option);
-    }
     if (document.getElementById("dataTypes")) document.getElementById("dataTypes").innerHTML = JSON.stringify(types, null, 4);
-    var jsonDATA = "const DEFAULT_CLASSES = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'];\nconst DEFAULT_NUM_CLASSES = DEFAULT_CLASSES.length;\nconst DEFAULT_DATA = [[5.1, 3.5, 1.4, 0.2, 0], [4.9, 3.0, 1.4, 0.2, 0], [4.7, 3.2, 1.3, 0.2, 0], [4.6, 3.1, 1.5, 0.2, 0], [5.0, 3.6, 1.4, 0.2, 0], [5.4, 3.9, 1.7, 0.4, 0], [4.6, 3.4, 1.4, 0.3, 0], [5.0, 3.4, 1.5, 0.2, 0], [4.4, 2.9, 1.4, 0.2, 0], [4.9, 3.1, 1.5, 0.1, 0], [5.4, 3.7, 1.5, 0.2, 0], [4.8, 3.4, 1.6, 0.2, 0], [4.8, 3.0, 1.4, 0.1, 0], [4.3, 3.0, 1.1, 0.1, 0], [5.8, 4.0, 1.2, 0.2, 0], [5.7, 4.4, 1.5, 0.4, 0], [5.4, 3.9, 1.3, 0.4, 0], [5.1, 3.5, 1.4, 0.3, 0], [5.7, 3.8, 1.7, 0.3, 0], [5.1, 3.8, 1.5, 0.3, 0], [5.4, 3.4, 1.7, 0.2, 0], [5.1, 3.7, 1.5, 0.4, 0], [4.6, 3.6, 1.0, 0.2, 0], [5.1, 3.3, 1.7, 0.5, 0], [4.8, 3.4, 1.9, 0.2, 0], [5.0, 3.0, 1.6, 0.2, 0], [5.0, 3.4, 1.6, 0.4, 0], [5.2, 3.5, 1.5, 0.2, 0], [5.2, 3.4, 1.4, 0.2, 0], [4.7, 3.2, 1.6, 0.2, 0], [4.8, 3.1, 1.6, 0.2, 0], [5.4, 3.4, 1.5, 0.4, 0], [5.2, 4.1, 1.5, 0.1, 0], [5.5, 4.2, 1.4, 0.2, 0], [4.9, 3.1, 1.5, 0.1, 0], [5.0, 3.2, 1.2, 0.2, 0], [5.5, 3.5, 1.3, 0.2, 0], [4.9, 3.1, 1.5, 0.1, 0], [4.4, 3.0, 1.3, 0.2, 0], [5.1, 3.4, 1.5, 0.2, 0], [5.0, 3.5, 1.3, 0.3, 0], [4.5, 2.3, 1.3, 0.3, 0], [4.4, 3.2, 1.3, 0.2, 0], [5.0, 3.5, 1.6, 0.6, 0], [5.1, 3.8, 1.9, 0.4, 0], [4.8, 3.0, 1.4, 0.3, 0], [5.1, 3.8, 1.6, 0.2, 0], [4.6, 3.2, 1.4, 0.2, 0], [5.3, 3.7, 1.5, 0.2, 0], [5.0, 3.3, 1.4, 0.2, 0], [7.0, 3.2, 4.7, 1.4, 1], [6.4, 3.2, 4.5, 1.5, 1], [6.9, 3.1, 4.9, 1.5, 1], [5.5, 2.3, 4.0, 1.3, 1], [6.5, 2.8, 4.6, 1.5, 1], [5.7, 2.8, 4.5, 1.3, 1], [6.3, 3.3, 4.7, 1.6, 1], [4.9, 2.4, 3.3, 1.0, 1], [6.6, 2.9, 4.6, 1.3, 1], [5.2, 2.7, 3.9, 1.4, 1], [5.0, 2.0, 3.5, 1.0, 1], [5.9, 3.0, 4.2, 1.5, 1], [6.0, 2.2, 4.0, 1.0, 1], [6.1, 2.9, 4.7, 1.4, 1], [5.6, 2.9, 3.6, 1.3, 1], [6.7, 3.1, 4.4, 1.4, 1], [5.6, 3.0, 4.5, 1.5, 1], [5.8, 2.7, 4.1, 1.0, 1], [6.2, 2.2, 4.5, 1.5, 1], [5.6, 2.5, 3.9, 1.1, 1], [5.9, 3.2, 4.8, 1.8, 1], [6.1, 2.8, 4.0, 1.3, 1], [6.3, 2.5, 4.9, 1.5, 1], [6.1, 2.8, 4.7, 1.2, 1], [6.4, 2.9, 4.3, 1.3, 1], [6.6, 3.0, 4.4, 1.4, 1], [6.8, 2.8, 4.8, 1.4, 1], [6.7, 3.0, 5.0, 1.7, 1], [6.0, 2.9, 4.5, 1.5, 1], [5.7, 2.6, 3.5, 1.0, 1], [5.5, 2.4, 3.8, 1.1, 1], [5.5, 2.4, 3.7, 1.0, 1], [5.8, 2.7, 3.9, 1.2, 1], [6.0, 2.7, 5.1, 1.6, 1], [5.4, 3.0, 4.5, 1.5, 1], [6.0, 3.4, 4.5, 1.6, 1], [6.7, 3.1, 4.7, 1.5, 1], [6.3, 2.3, 4.4, 1.3, 1], [5.6, 3.0, 4.1, 1.3, 1], [5.5, 2.5, 4.0, 1.3, 1], [5.5, 2.6, 4.4, 1.2, 1], [6.1, 3.0, 4.6, 1.4, 1], [5.8, 2.6, 4.0, 1.2, 1], [5.0, 2.3, 3.3, 1.0, 1], [5.6, 2.7, 4.2, 1.3, 1], [5.7, 3.0, 4.2, 1.2, 1], [5.7, 2.9, 4.2, 1.3, 1], [6.2, 2.9, 4.3, 1.3, 1], [5.1, 2.5, 3.0, 1.1, 1], [5.7, 2.8, 4.1, 1.3, 1], [6.3, 3.3, 6.0, 2.5, 2], [5.8, 2.7, 5.1, 1.9, 2], [7.1, 3.0, 5.9, 2.1, 2], [6.3, 2.9, 5.6, 1.8, 2], [6.5, 3.0, 5.8, 2.2, 2], [7.6, 3.0, 6.6, 2.1, 2], [4.9, 2.5, 4.5, 1.7, 2], [7.3, 2.9, 6.3, 1.8, 2], [6.7, 2.5, 5.8, 1.8, 2], [7.2, 3.6, 6.1, 2.5, 2], [6.5, 3.2, 5.1, 2.0, 2], [6.4, 2.7, 5.3, 1.9, 2], [6.8, 3.0, 5.5, 2.1, 2], [5.7, 2.5, 5.0, 2.0, 2], [5.8, 2.8, 5.1, 2.4, 2], [6.4, 3.2, 5.3, 2.3, 2], [6.5, 3.0, 5.5, 1.8, 2], [7.7, 3.8, 6.7, 2.2, 2], [7.7, 2.6, 6.9, 2.3, 2], [6.0, 2.2, 5.0, 1.5, 2], [6.9, 3.2, 5.7, 2.3, 2], [5.6, 2.8, 4.9, 2.0, 2], [7.7, 2.8, 6.7, 2.0, 2], [6.3, 2.7, 4.9, 1.8, 2], [6.7, 3.3, 5.7, 2.1, 2], [7.2, 3.2, 6.0, 1.8, 2], [6.2, 2.8, 4.8, 1.8, 2], [6.1, 3.0, 4.9, 1.8, 2], [6.4, 2.8, 5.6, 2.1, 2], [7.2, 3.0, 5.8, 1.6, 2], [7.4, 2.8, 6.1, 1.9, 2], [7.9, 3.8, 6.4, 2.0, 2], [6.4, 2.8, 5.6, 2.2, 2], [6.3, 2.8, 5.1, 1.5, 2], [6.1, 2.6, 5.6, 1.4, 2], [7.7, 3.0, 6.1, 2.3, 2], [6.3, 3.4, 5.6, 2.4, 2], [6.4, 3.1, 5.5, 1.8, 2], [6.0, 3.0, 4.8, 1.8, 2], [6.9, 3.1, 5.4, 2.1, 2], [6.7, 3.1, 5.6, 2.4, 2], [6.9, 3.1, 5.1, 2.3, 2], [5.8, 2.7, 5.1, 1.9, 2], [6.8, 3.2, 5.9, 2.3, 2], [6.7, 3.3, 5.7, 2.5, 2], [6.7, 3.0, 5.2, 2.3, 2], [6.3, 2.5, 5.0, 1.9, 2], [6.5, 3.0, 5.2, 2.0, 2], [6.2, 3.4, 5.4, 2.3, 2], [5.9, 3.0, 5.1, 1.8, 2]];\n\n";
+    var jsonDATA = "const IRIS_CLASSES = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'];\nconst IRIS_NUM_CLASSES = IRIS_CLASSES.length;\nconst IRIS_DATA = [[5.1, 3.5, 1.4, 0.2, 0], [4.9, 3.0, 1.4, 0.2, 0], [4.7, 3.2, 1.3, 0.2, 0], [4.6, 3.1, 1.5, 0.2, 0], [5.0, 3.6, 1.4, 0.2, 0], [5.4, 3.9, 1.7, 0.4, 0], [4.6, 3.4, 1.4, 0.3, 0], [5.0, 3.4, 1.5, 0.2, 0], [4.4, 2.9, 1.4, 0.2, 0], [4.9, 3.1, 1.5, 0.1, 0], [5.4, 3.7, 1.5, 0.2, 0], [4.8, 3.4, 1.6, 0.2, 0], [4.8, 3.0, 1.4, 0.1, 0], [4.3, 3.0, 1.1, 0.1, 0], [5.8, 4.0, 1.2, 0.2, 0], [5.7, 4.4, 1.5, 0.4, 0], [5.4, 3.9, 1.3, 0.4, 0], [5.1, 3.5, 1.4, 0.3, 0], [5.7, 3.8, 1.7, 0.3, 0], [5.1, 3.8, 1.5, 0.3, 0], [5.4, 3.4, 1.7, 0.2, 0], [5.1, 3.7, 1.5, 0.4, 0], [4.6, 3.6, 1.0, 0.2, 0], [5.1, 3.3, 1.7, 0.5, 0], [4.8, 3.4, 1.9, 0.2, 0], [5.0, 3.0, 1.6, 0.2, 0], [5.0, 3.4, 1.6, 0.4, 0], [5.2, 3.5, 1.5, 0.2, 0], [5.2, 3.4, 1.4, 0.2, 0], [4.7, 3.2, 1.6, 0.2, 0], [4.8, 3.1, 1.6, 0.2, 0], [5.4, 3.4, 1.5, 0.4, 0], [5.2, 4.1, 1.5, 0.1, 0], [5.5, 4.2, 1.4, 0.2, 0], [4.9, 3.1, 1.5, 0.1, 0], [5.0, 3.2, 1.2, 0.2, 0], [5.5, 3.5, 1.3, 0.2, 0], [4.9, 3.1, 1.5, 0.1, 0], [4.4, 3.0, 1.3, 0.2, 0], [5.1, 3.4, 1.5, 0.2, 0], [5.0, 3.5, 1.3, 0.3, 0], [4.5, 2.3, 1.3, 0.3, 0], [4.4, 3.2, 1.3, 0.2, 0], [5.0, 3.5, 1.6, 0.6, 0], [5.1, 3.8, 1.9, 0.4, 0], [4.8, 3.0, 1.4, 0.3, 0], [5.1, 3.8, 1.6, 0.2, 0], [4.6, 3.2, 1.4, 0.2, 0], [5.3, 3.7, 1.5, 0.2, 0], [5.0, 3.3, 1.4, 0.2, 0], [7.0, 3.2, 4.7, 1.4, 1], [6.4, 3.2, 4.5, 1.5, 1], [6.9, 3.1, 4.9, 1.5, 1], [5.5, 2.3, 4.0, 1.3, 1], [6.5, 2.8, 4.6, 1.5, 1], [5.7, 2.8, 4.5, 1.3, 1], [6.3, 3.3, 4.7, 1.6, 1], [4.9, 2.4, 3.3, 1.0, 1], [6.6, 2.9, 4.6, 1.3, 1], [5.2, 2.7, 3.9, 1.4, 1], [5.0, 2.0, 3.5, 1.0, 1], [5.9, 3.0, 4.2, 1.5, 1], [6.0, 2.2, 4.0, 1.0, 1], [6.1, 2.9, 4.7, 1.4, 1], [5.6, 2.9, 3.6, 1.3, 1], [6.7, 3.1, 4.4, 1.4, 1], [5.6, 3.0, 4.5, 1.5, 1], [5.8, 2.7, 4.1, 1.0, 1], [6.2, 2.2, 4.5, 1.5, 1], [5.6, 2.5, 3.9, 1.1, 1], [5.9, 3.2, 4.8, 1.8, 1], [6.1, 2.8, 4.0, 1.3, 1], [6.3, 2.5, 4.9, 1.5, 1], [6.1, 2.8, 4.7, 1.2, 1], [6.4, 2.9, 4.3, 1.3, 1], [6.6, 3.0, 4.4, 1.4, 1], [6.8, 2.8, 4.8, 1.4, 1], [6.7, 3.0, 5.0, 1.7, 1], [6.0, 2.9, 4.5, 1.5, 1], [5.7, 2.6, 3.5, 1.0, 1], [5.5, 2.4, 3.8, 1.1, 1], [5.5, 2.4, 3.7, 1.0, 1], [5.8, 2.7, 3.9, 1.2, 1], [6.0, 2.7, 5.1, 1.6, 1], [5.4, 3.0, 4.5, 1.5, 1], [6.0, 3.4, 4.5, 1.6, 1], [6.7, 3.1, 4.7, 1.5, 1], [6.3, 2.3, 4.4, 1.3, 1], [5.6, 3.0, 4.1, 1.3, 1], [5.5, 2.5, 4.0, 1.3, 1], [5.5, 2.6, 4.4, 1.2, 1], [6.1, 3.0, 4.6, 1.4, 1], [5.8, 2.6, 4.0, 1.2, 1], [5.0, 2.3, 3.3, 1.0, 1], [5.6, 2.7, 4.2, 1.3, 1], [5.7, 3.0, 4.2, 1.2, 1], [5.7, 2.9, 4.2, 1.3, 1], [6.2, 2.9, 4.3, 1.3, 1], [5.1, 2.5, 3.0, 1.1, 1], [5.7, 2.8, 4.1, 1.3, 1], [6.3, 3.3, 6.0, 2.5, 2], [5.8, 2.7, 5.1, 1.9, 2], [7.1, 3.0, 5.9, 2.1, 2], [6.3, 2.9, 5.6, 1.8, 2], [6.5, 3.0, 5.8, 2.2, 2], [7.6, 3.0, 6.6, 2.1, 2], [4.9, 2.5, 4.5, 1.7, 2], [7.3, 2.9, 6.3, 1.8, 2], [6.7, 2.5, 5.8, 1.8, 2], [7.2, 3.6, 6.1, 2.5, 2], [6.5, 3.2, 5.1, 2.0, 2], [6.4, 2.7, 5.3, 1.9, 2], [6.8, 3.0, 5.5, 2.1, 2], [5.7, 2.5, 5.0, 2.0, 2], [5.8, 2.8, 5.1, 2.4, 2], [6.4, 3.2, 5.3, 2.3, 2], [6.5, 3.0, 5.5, 1.8, 2], [7.7, 3.8, 6.7, 2.2, 2], [7.7, 2.6, 6.9, 2.3, 2], [6.0, 2.2, 5.0, 1.5, 2], [6.9, 3.2, 5.7, 2.3, 2], [5.6, 2.8, 4.9, 2.0, 2], [7.7, 2.8, 6.7, 2.0, 2], [6.3, 2.7, 4.9, 1.8, 2], [6.7, 3.3, 5.7, 2.1, 2], [7.2, 3.2, 6.0, 1.8, 2], [6.2, 2.8, 4.8, 1.8, 2], [6.1, 3.0, 4.9, 1.8, 2], [6.4, 2.8, 5.6, 2.1, 2], [7.2, 3.0, 5.8, 1.6, 2], [7.4, 2.8, 6.1, 1.9, 2], [7.9, 3.8, 6.4, 2.0, 2], [6.4, 2.8, 5.6, 2.2, 2], [6.3, 2.8, 5.1, 1.5, 2], [6.1, 2.6, 5.6, 1.4, 2], [7.7, 3.0, 6.1, 2.3, 2], [6.3, 3.4, 5.6, 2.4, 2], [6.4, 3.1, 5.5, 1.8, 2], [6.0, 3.0, 4.8, 1.8, 2], [6.9, 3.1, 5.4, 2.1, 2], [6.7, 3.1, 5.6, 2.4, 2], [6.9, 3.1, 5.1, 2.3, 2], [5.8, 2.7, 5.1, 1.9, 2], [6.8, 3.2, 5.9, 2.3, 2], [6.7, 3.3, 5.7, 2.5, 2], [6.7, 3.0, 5.2, 2.3, 2], [6.3, 2.5, 5.0, 1.9, 2], [6.5, 3.0, 5.2, 2.0, 2], [6.2, 3.4, 5.4, 2.3, 2], [5.9, 3.0, 5.1, 1.8, 2]];\n\n";
     var data = frames;
     var trainingData = {};
     for (const type in types) trainingData[type] = [];
@@ -174,11 +175,12 @@ function resettingData() {
         var dType = types[type].toUpperCase();
         jsonDATA += "const " + dType + "_CLASSES = " + JSON.stringify(Object.keys(poseIndex)) + ";\nconst " + dType + "_NUM_CLASSES = " + dType + "_CLASSES.length;\nconst " + dType + "_DATA = " + JSON.stringify(trainingData[type]) + ";\n\n";
     }
-    jsonDATA += "const IRIS_CLASSES = DEFAULT_CLASSES;\nconst IRIS_NUM_CLASSES = DEFAULT_NUM_CLASSES;\nconst IRIS_DATA = DEFAULT_DATA;";
+    jsonDATA += "const SELECTED_CLASSES = " + types[selectData].toUpperCase() + "_CLASSES;\nconst SELECTED_NUM_CLASSES = " + types[selectData].toUpperCase() + "_NUM_CLASSES;\nconst SELECTED_DATA = " + types[selectData].toUpperCase() + "_DATA;\nconst SELECTED_NUM_DATA = SELECTED_DATA[0].length;";
     latestData = jsonDATA;
     downloader.disabled = false;
     showfbdata.disabled = false;
-    selectedData.disabled = false;
+    deleteAfter.disabled = false;
+    maxFPS.disabled = false;
     if (canShow) showData();
 }
 
@@ -196,7 +198,7 @@ function getLatestData() {
     download('data.js', latestData);
 }
 // ================== LATEST DATA SHOWING HANDLING FUNCTIONS ==================
-selectedData.onchange = function (e) {
+selectedData.onchange = function(e) {
     showData();
 }
 
@@ -210,11 +212,11 @@ function showData() {
     table.innerHTML = "<tr><th>pose</th><th>trainingFrame</th><th>openposeFrame</th><th>" + selectedData.options[selectedData.selectedIndex].textContent.toUpperCase() + "</th><th>key</th></tr>";
     for (const frame of data) {
         var row = document.createElement("tr");
-        row.innerHTML = "<td>" + frame.pose + "</td><td class='tf'><img src='" + frame.trainingFrame + "'></td><td class='tf'><img src='" + frame.openposeFrame + "'></td><td>" + JSON.stringify(frame[selectedData.options[selectedData.selectedIndex].value]) + "</td><td class='deleteBtn'><a onclick='delData(\"" + frame.key + "\");' href='javascript:void(0);'>Delete " + frame.key + "</a></td>";
+        row.innerHTML = "<td>" + frame.pose + "</td><td class='tf'><img src='" + frame.trainingFrame + "'></td><td class='tf'><img src='" + frame.openposeFrame + "'></td><td>" + JSON.stringify(frame[selectedData.options[selectedData.selectedIndex].value]) + "</td><td class='deleteBtn'><a onclick='delData(\"" + frame.key + "\");' href='javascript:void(0);'>Delete " + frame.key + "</a><br><br><a href='javascript:void(0);'>Change pose of " + frame.key + " to: <select class='noform' onchange='changePose(\"" + frame.key + "\");' id='" + frame.key + "change'><option value='none' disabled selected>Select a pose</option><option value='warriorii'>Warrior II</option><option value='tree'>Tree</option><option value='triangle'>Triangle</option><option value='none'>No Pose</option></select></a></td>";
         table.appendChild(row);
-        // console.log("Writing row " + count + ", key " + frame.key + " after " + (Date.now() - time) + "ms.");
         count++;
     }
+    console.log("Wrote " + count + " rows after " + (Date.now() - time) + "ms.");
 }
 // ==================== FORM HANDLING PROCESSING FUNCTIONS ===================
 formSelector.addEventListener('submit', handleFormSubmit);

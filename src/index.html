@@ -58,6 +58,10 @@
             width: 19%;
         }
 
+        .noform {
+            width: fit-content;
+        }
+
         table,
         th,
         td {
@@ -77,32 +81,11 @@
 
 <body>
     <h1>Yoga Master Youtube &rarr; Data Training Pipeline Server</h1>
-    <hr>
-    <input type="button" value="Add More Data" onclick="addFields();" />
-    <input type="button" value="Delete Last Data" onclick="delFields();" />
-    <br>
-    <br>
-    <form id="form-selector" class="inline">
-        <input name="url" placeholder="YouTube Link" required>
-        <br>
-        <div id="add"></div>
-        <br>
-        <input type="submit" value="Submit"> </form>
-    <br>
-    <input type="number" id="maxFPS" name="maxFPS" placeholder="fps" max="20" min="1" step="1" onchange="updateFPS()" disabled>
-    <label for="maxFPS"> - Max FPS to sample video (1 - 20)</label>
-    <br>
-    <br>
-    <input type="checkbox" id="deleteAfter" name="deleteAfter" value="deleteAfter" onclick="deleteAftr()" disabled>
-    <label for="deleteAfter">Delete files after processing</label>
-    <br>
-    <hr>
-    <input id="showHistory" type="button" value="Show History" onclick="toggleHistoryView();" disabled />
-    <div id="histView" style="display: none;">
-        <br>
-        <input id="requeHistory" type="button" value="Requeue History" onclick="requeHistory();" />
-        <br>
-        <br>
+    <hr> <input type="button" value="Add More Data" onclick="addFields();" /> <input type="button" value="Delete Last Data" onclick="delFields();" /> <br> <br>
+    <form id="form-selector" class="inline"> <input name="url" placeholder="YouTube Link" required> <br>
+        <div id="add"></div> <br> <input type="submit" value="Submit"> </form> <br> <input type="number" id="maxFPS" name="maxFPS" placeholder="fps" max="20" min="1" step="1" onchange="updateFPS()" disabled> <label for="maxFPS"> - Max FPS to sample video (1 - 20)</label> <br> <br> <input type="checkbox" id="deleteAfter" name="deleteAfter" value="deleteAfter" onclick="deleteAftr()" disabled> <label for="deleteAfter">Delete files after processing</label> <br>
+    <hr> <input id="showHistory" type="button" value="Show History" onclick="toggleHistoryView();" disabled />
+    <div id="histView" style="display: none;"> <br> <input id="requeHistory" type="button" value="Requeue History" onclick="requeHistory();" /> <br> <br>
         <table style="width:100%" id="histTable">
             <tr>
                 <th>History URLs</th>
@@ -121,16 +104,10 @@
             </tr>
         </table>
     </div>
-    <hr>
-    <input id="download" type="button" value="Download latest training data.js" onclick="getLatestData()" disabled />
+    <hr> <input id="download" type="button" value="Download latest training data.js" onclick="getLatestData()" disabled />
     <p id="lastUpdated"></p>
-    <hr>
-    <input id="showFBData" type="button" value="Show Firebase Training Data" onclick="showData();" disabled />
-    <select id="selectedData" name="dataType" disabled></select>
-    <br>
-    <br>
-    <pre id="dataTypes"></pre>
-    <br>
+    <hr> <input id="showFBData" type="button" value="Show Firebase Training Data" onclick="showData();" disabled /> <select id="selectedData" name="dataType" class='noform' disabled></select> <br> <br>
+    <pre id="dataTypes"></pre> <br>
     <table style="width:100%" id="tdb">
         <tr>
             <th>pose</th>

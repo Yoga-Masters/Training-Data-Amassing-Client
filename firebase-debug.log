@@ -1,0 +1,60 @@
+[debug] [2018-04-30T13:28:48.285Z] ----------------------------------------------------------------------
+[debug] [2018-04-30T13:28:48.287Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dutta\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-04-30T13:28:48.288Z] CLI Version:   3.18.2
+[debug] [2018-04-30T13:28:48.288Z] Platform:      win32
+[debug] [2018-04-30T13:28:48.288Z] Node Version:  v9.11.1
+[debug] [2018-04-30T13:28:48.288Z] Time:          Mon Apr 30 2018 06:28:48 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:28:48.288Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-04-30T13:28:48.307Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-04-30T13:28:48.307Z] > authorizing via signed-in user
+[debug] [2018-04-30T13:28:48.309Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-04-30T13:28:48.310Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/6o3hMUIFz6neQ4ohTQeG-nKp43I3UgxzCRf8RqP3AYM',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Mon Apr 30 2018 06:28:48 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:28:48.594Z] <<< HTTP RESPONSE 200
+[debug] [2018-04-30T13:29:20.975Z] ----------------------------------------------------------------------
+[debug] [2018-04-30T13:29:20.978Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dutta\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] [2018-04-30T13:29:20.978Z] CLI Version:   3.18.4
+[debug] [2018-04-30T13:29:20.978Z] Platform:      win32
+[debug] [2018-04-30T13:29:20.978Z] Node Version:  v9.11.1
+[debug] [2018-04-30T13:29:20.979Z] Time:          Mon Apr 30 2018 06:29:20 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:29:20.979Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-04-30T13:29:20.991Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-04-30T13:29:20.992Z] > authorizing via signed-in user
+[debug] [2018-04-30T13:29:20.994Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-04-30T13:29:20.994Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/6o3hMUIFz6neQ4ohTQeG-nKp43I3UgxzCRf8RqP3AYM',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Mon Apr 30 2018 06:29:20 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:29:21.277Z] <<< HTTP RESPONSE 200
+[debug] [2018-04-30T13:29:21.288Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/yoga-master-training-db  
+  
+ Mon Apr 30 2018 06:29:21 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:29:21.733Z] <<< HTTP RESPONSE 200
+[debug] [2018-04-30T13:29:21.734Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/yoga-master-training-db/tokens  
+  
+ Mon Apr 30 2018 06:29:21 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:29:22.143Z] <<< HTTP RESPONSE 200
+[debug] [2018-04-30T13:29:22.143Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/yoga-master-training-db  
+  
+ Mon Apr 30 2018 06:29:22 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:29:22.494Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\dutta\Documents\GitHub\Training-Data-Amassing-Client'...
+[info] 
+[debug] [2018-04-30T13:29:22.496Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/743195328789/clients/_:getWebAppConfig  
+  
+ Mon Apr 30 2018 06:29:22 GMT-0700 (Pacific Daylight Time)
+[debug] [2018-04-30T13:29:22.978Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: src
+[info] +  hosting: Local server: http://localhost:5000
+
