@@ -176,6 +176,7 @@ function resettingData() {
         jsonDATA += "const " + dType + "_CLASSES = " + JSON.stringify(Object.keys(poseIndex)) + ";\nconst " + dType + "_NUM_CLASSES = " + dType + "_CLASSES.length;\nconst " + dType + "_DATA = " + JSON.stringify(trainingData[type]) + ";\n\n";
     }
     jsonDATA += "const SELECTED_CLASSES = " + types[selectData].toUpperCase() + "_CLASSES;\nconst SELECTED_NUM_CLASSES = " + types[selectData].toUpperCase() + "_NUM_CLASSES;\nconst SELECTED_DATA = " + types[selectData].toUpperCase() + "_DATA;\nconst SELECTED_NUM_DATA = SELECTED_DATA[0].length;";
+    jsonDATA += "\n\nmodule.exports = {\n    getSelectedClasses: function() { return SELECTED_CLASSES; },\n    getSelectedNumClasses: function() { return SELECTED_NUM_CLASSES; },\n    getSelectedData: function() { return SELECTED_DATA; },\n    getSelectedNumData: function() { return SELECTED_NUM_DATA; },\n};";
     latestData = jsonDATA;
     downloader.disabled = false;
     showfbdata.disabled = false;
